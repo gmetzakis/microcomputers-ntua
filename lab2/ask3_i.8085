@@ -1,0 +1,29 @@
+ZEROS:			;svinoume ta LEDs
+	MVI A,FFH
+	STA 3000H
+START:			;diavazoume eisodo kai thn apothikevoume ston B
+	LDA 2000H
+	MOV B,A
+	MVI D,80H	;ousiastika thetoume ton D iso me 80H, kai 
+	MVI E,08H	;kanoume 8 loupes opou se kathe loupa kanoume 
+LOOP1:			;ena shift aristera ton B pou exei ton A (diladi 
+	MOV A,B	;to input mas), kai ama vroume 1 ws kratoumeno, tote
+	RAL		;vrikame to aristerotero ON diakopti kai printaroume
+	JC LEDSON	;ton kataxwrith D
+	MOV B,A
+	DCR E		;alliws, kanoume ena shift deksia ton D, prosthetoume
+	MOV A,E	;to 80H, kai proxwrame sth defterh fora ths loupas ktl
+	CPI 00H
+	JZ ZEROS	;ama teleiwsei h loupa(8 fores) kai de vrei asso ws
+	MOV A,D	;kratoumeno tou RAL, tote einai oloi oi diakoptes
+	RRC		;kleistoi, opote pame sto ZEROS kai ksana ap htn arxh
+	ADI 80H
+	MOV D,A
+	JMP LOOP1
+
+LEDSON:
+	MOV A,D
+	CMA
+	STA 3000H
+	JMP START
+END

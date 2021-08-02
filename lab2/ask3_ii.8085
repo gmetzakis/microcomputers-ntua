@@ -1,0 +1,37 @@
+IN 10H			;prostasia mhnmhs
+LXI B,03E8H		;katallhlos xronos kathisterishs
+START:
+	CALL KIND	;diavazoume apo pliktrologio kai an to input
+	CPI 09H	;einai megalitero h iso tou 9 tote ksana START
+	JNC START
+	MVI D,04H
+	CPI 05H	;alliws, analoga me to an einai 0<x<5 h 4<x<9
+	JC MIKRO	;phgaine sto MIKRO h sto MEGALO
+MEGALO:
+	MVI A,0FH	;se aftes tis apla anavoume ta swsta LEDs me ton
+	STA 3000H	;gnwsto tropo, kaloume kathisterish, kai ta svinoume
+	CALL DELB
+	MVI A,FFH	;kai olo afto to anapse svise, to kanoume 4 fores
+	STA 3000H	;elegxontas ton arxikopoihmeno apo prin kataxwrhth D
+	CALL DELB
+	DCR D
+	MOV A,D
+	CPI 00H
+	JZ START
+	JMP MEGALO
+
+
+MIKRO:
+	MVI A,F0H	;edw ta idia alla gia ta alla 4 LEDs
+	STA 3000H
+	CALL DELB
+	MVI A,FFH
+	STA 3000H
+	CALL DELB
+	DCR D
+	MOV A,D
+	CPI 00H
+	JZ START
+	JMP MIKRO
+
+END

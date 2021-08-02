@@ -1,0 +1,69 @@
+START:	
+	IN 10H			;gia prostasia mnhmhs
+	LXI H,0A00H		;edw tha apothikefsw to output tou 7segment
+	MVI M,10H		;gia na kanw print to keno
+	INX H			
+	MVI M,10H	
+	INX H		
+	MVI M,10H	 
+	INX H
+	MVI M,10H
+
+	MVI A,0DH		
+	SIM			;enable interrupts	
+	EI
+
+WAIT:				;perimenw gia interrupt
+	JMP WAIT	
+
+
+INTR_ROUTINE:		
+
+	MVI E,3CH	
+	PUSH D			;60sec 
+	EI
+LOOP1:
+
+	MVI A,FFH
+	CMA
+	STA 3000H
+	
+	POP D
+	MOV A,E
+	MVI C,00H
+DECA:				;metatrepw se dekadiko
+	SUI 0AH
+	INR C			
+	JNC DECA 		;an den exw kratoumeno, ksana to idio	
+	DCR C	
+	ADI 0AH 
+
+	LXI H,0A04H
+	MOV M,A 		;apothikevw sto 5o kai 6o toy 7segment
+				
+	INX H		
+	MOV M,C	
+
+	PUSH D
+	LXI D,0A00H		;fortwnw th diefthinsh pou exw apothikefsei
+	CALL STDM		;ta outputs, sth thesh pou diavazei h DCD
+
+	CALL DCD		;provalw sto 7segment
+
+	LXI B,01F4H		;kathisterhsh 500msec, kleinw LEDs,
+	CALL DELB
+	MVI A,FFH
+	STA 3000H
+
+	LXI B,01F4H
+	CALL DELB		;kathisterhsh 500msec, meiwnw ton metrhth
+				;afou sinolika exei perasei 1sec
+	POP D
+	DCR E
+	PUSH D
+	MOV A,E		;kanw elegxo an mhdenise, alliws phgainw LOOP1
+	CPI 00H
+	JNZ LOOP1
+
+	JMP WAIT		;an mhdenise paw wait
+END

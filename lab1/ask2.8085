@@ -1,0 +1,72 @@
+IN 10H
+LXI B,0244H		;orismos kathisterishs, opou 0244H=500d
+MVI A,FEH			
+STA 3000H		;emfanish MSB led(arnhtikh logikh sta LED,gi auto 7FH)
+CMA
+MOV D,A		;o D tha exei to apotelesma pou tha emfanizoume
+CALL DELB		;routina kathisterishs
+MVI L,01H		;L kataxwriths gia katefthinsi (1 left, 0 right)
+LOOP1:
+	LDA 2000H
+	ANI 02H	;apomonwsh 2ou LSB diakopth kai elegxos
+	JZ OKK
+	MVI A,FEH	;emfanise LSB led kai kane loupa mexri o diakoptis OFF
+	STA 3000H
+	JMP LOOP1
+
+OKK:		
+	MOV A,L
+	CPI 01H	;elegxoume to L, kai an einai iso me 01H
+	JZ LEFT	;an nai, tote phgaine LEFT
+	JMP RIGHT	;alliws phgaine RIGHT
+
+LEFT:			
+	MOV A,D	;metaferoume to byte sto A kai elegxoume an vrisketai
+	CPI 80H	;sto MSB tou output
+	JZ ELEGXOS	;an nai phgaine ELEGXOS gia na doume ti theloume meta
+
+	RLC		;alliws olisthish aristera kai phgaine DISPLAY1
+	JMP DISPLAY1
+
+ELEGXOS:
+	LDA 2000H	;diavazoume 2o lsb diakopth apo 2000H
+	ANI 01H
+	CPI 01H
+	JZ RIGHT	;an einai ON, pame right
+	MVI D,01H	;alliws vazoume D = 01H kai to emfanizoume sto DISPLAY1
+	MOV A,D
+
+DISPLAY1:
+	CMA		;arnhtikh logikh ta LED, ara antistrefoume
+	STA 3000H	;emfanizoume
+	CMA		;kai epanaferoume
+	MOV D,A
+	CALL DELB	;routina kathisterishs
+	MVI L,01H	;fortwsh tou 01H sto L wste na ksanapaei aristera meta
+	JMP LOOP1	;epistrofi sto loop1
+
+RIGHT:
+	MOV A,D		;paromoios elegxos me prin
+	CPI 01H		;sto LSB tou output
+	JZ ELEGXOS1		;an nai phgaine ELEGXOS1
+	
+	RRC			;olisthish deksia
+	JMP DISPLAY2		;alliws de xreiazetai elegxos
+
+ELEGXOS1:
+	LDA 2000H
+	ANI 01H
+	CPI 01H
+	JZ LEFT	;to idio me prin, antistoixa
+	MVI D,80H
+	MOV A,D
+
+DISPLAY2:
+	CMA
+	STA 3000H
+	CMA
+	MOV D,A
+	CALL DELB
+	MVI L,00H	;fortwnoume sto L to 00H gia na ksanapaei deksia 
+	JMP LOOP1
+END

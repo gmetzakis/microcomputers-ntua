@@ -1,0 +1,88 @@
+START:	
+	IN 10H			;gia prostasia mnhmhs
+	LXI H,0A00H		;edw tha apothikefsw to output tou 7segment
+	MVI M,10H		;gia na kanw print to keno
+	INX H			
+	MVI M,10H	
+	INX H		
+	MVI M,10H	 
+	INX H
+	MVI M,10H
+
+
+	MVI C,32H		;C = 50 Decimal
+	INR C
+	MVI D,64H		;D = 100 Decimal
+	INR D
+	MVI E,C8H		;E = 200 Decimal
+	INR E
+	PUSH D			;ta afksanw ola kata 1, giati sthn ekfwnhsh
+				;ta kleista diasthmata einai to panw orio
+	
+	MVI A,0DH		;enable interrupts
+	SIM			;in RST 6.5
+	EI
+	
+WAIT:
+	JMP WAIT
+
+INTR_ROUTINE:
+	POP H
+	
+	CALL KIND		;diavazw apo pliktrologio
+	MOV E,A		;to E exei to shmantikotero pshfio
+	CALL KIND		
+	MOV D,A		;to D exei to ligotero shmantiko pshfio
+
+	LXI H,0A04H
+	MOV M,D		;vazw sto aristerotero 7seg to shmantiko(E)
+	INX H		
+	MOV M,E		;kai sto diplano tou to ligotero shmantiko(D)
+	
+
+	MOV A,E		;edw sigrinw me ta katwflia
+	RLC
+	RLC
+	RLC
+	RLC
+	ADD D			;kanw 4 shifts aristera to shmantiko pshfio
+	MOV D,A		;kai tou prosthetw to ligotero shmantiko
+				;gia na exw ton plhrh arithmo
+	MOV A,D
+	CMP C
+	JC FIRST
+	POP D
+	CMP D
+	JC SECOND
+	CMP E
+	PUSH D
+	JC THIRD
+	
+	MVI A,08H
+	CMA
+	STA 3000H		;ON to 4o LED an o arithmos x>200
+	JMP DISPLAY1
+FIRST:
+	MVI A,01H
+	CMA
+	STA 3000H		;ON to 1o LED an x<=50
+	JMP DISPLAY1
+SECOND:
+	PUSH D
+	MVI A,02H
+	CMA
+	STA 3000H		;ON to 2o LED an 50<x<=100
+	JMP DISPLAY1	
+THIRD:
+	MVI A,04H		;on to 3o Led an 100<x<=200
+	CMA
+	STA 3000H
+	JMP DISPLAY1
+
+DISPLAY1:
+	LXI D,0A00H		
+	CALL STDM
+	EI			;enable interrupts again
+	CALL DCD
+	JMP WAIT
+END

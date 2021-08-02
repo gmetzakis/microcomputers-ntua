@@ -1,0 +1,66 @@
+START:			;arxikopoioume thn eksodo sto 0
+	LDA 2000H	;kai vazoume asso mono otan xreiazetai
+	MVI C,00H
+	MOV B,A
+	
+	MVI D,01H
+	ANI 03H
+	JNZ BIT0
+	JMP IN_2_3
+
+BIT0:
+	MOV C,D
+
+IN_2_3:	
+	MOV A,B
+	MVI D,02H
+	ANI 0CH
+	CPI 0CH
+	JZ BIT1
+	JMP IN_4_5
+
+BIT1:
+	MOV A,C
+	ADD D
+	MOV C,A
+	
+IN_4_5:
+	MOV A,B
+	MVI D,04H
+	ANI 30H
+	JNZ BIT2
+	JMP BIT3_ZERO
+
+BIT2:
+	MOV A,C
+	ADD D
+	MOV C,A
+
+BIT3:			;edw mpainoume an h eksodos ths pylhs OR prin,
+	MOV A,B	;einai 1
+	ANI C0H
+	CPI C0H	;pairnoume thn AND twn bits 6,7
+	JZ DISPLAY	;1 h and, 1 kai h or, 0 h xor
+	MVI D,08H	;alliws h xor einai 1
+	MOV A,C
+	ADD D
+	MOV C,A
+	JMP DISPLAY
+
+BIT3_ZERO:		;edw mpainoume an h OR twn bits eisodou 4,5 einai 0
+	MOV A,B
+	ANI C0H
+	CPI C0H
+	JNZ DISPLAY	;0 oi or/and, ara 0 kai h xor
+	MVI D,08H
+	MOV A,C
+	ADD D
+	MOV C,A	
+
+DISPLAY:
+	MOV A,C
+	CMA
+	STA 3000H
+	JMP START
+
+END

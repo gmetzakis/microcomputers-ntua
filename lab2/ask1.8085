@@ -1,0 +1,44 @@
+IN 10H
+LXI H,0900H
+MVI A,FFH
+
+MVI C,00H
+MVI D,00H
+MVI E,00H
+
+
+LOOP1:
+	MOV M,A
+	MVI B,08H	;gia ta mhdenika
+
+ERWTIMA2:
+	RAR
+	JC ASSOS	;einai assos
+	INX D		;an 0, auksise ton diplo katax. DE
+ASSOS:	
+	DCR B
+	JNZ ERWTIMA2 
+
+	MOV A,M	;ksana pairnoume ton A
+	CPI 20H
+	JC NOTGOOD
+	CPI 71H
+	JNC NOTGOOD	;elegxoume an anhkei sto diasthma [20H,70h]
+	INR C		;kai analoga auksanoume h oxi ton C
+NOTGOOD:
+	MOV A,M	;ksana pairnoume ton A,kai elegxoume an
+	CPI 00H	;ftasame sto 0, opou kai oloklirwnoume th loupa
+	JZ ENDLOOP
+	DCR A		;alliws proxwrame sthn epomenh thesh mnhmhs
+	INX H		;kai meiwnoume to A kata 1
+	JMP LOOP1
+
+ENDLOOP:
+
+	MOV A,C	;opws perimename einai 81d (31H) ta stoixeia x opou 32d <= x <= 112d
+	;MOV A,D	;kai afairwntas ta sxolio, vlepoume oti einai 1024 ta mhdenika
+	;MOV A,E	;dhladh o D=04H kai o E=00H
+	CMA
+	STA 3000H
+
+END

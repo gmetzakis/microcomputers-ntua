@@ -1,0 +1,41 @@
+LOOPA:
+	MVI D,00H
+	LDA 2000H
+	CPI 64H	;elegxoume an >=100
+	JNC BIGGER	;an nai pame sth routina BIGGER
+
+DEKADES:
+	CPI 0AH	;elegxoume an >=10
+	JC MONADES	;an nai pame MONADES
+
+	INR D		;alliws afksanoume kata 1 to D
+	SUI 0AH	;kai meiwnoume kata 10 to A
+	JMP DEKADES	;ksana to idio mexri A<10
+
+MONADES:
+	MOV E,A	;apothikeoume to A(tis monades mas diladi)
+	MOV A,D	;metaferoume to D(tis dekades mas)
+	RLC		;kai kanoume 4 olisthiseis aristera gia na 
+	RLC		;paei sta 4 MSB
+	RLC
+	RLC
+	MOV D,A
+	MOV A,E	
+
+	ADD D		;prosthetoume sto apotelesma twn RLC, tis monades
+	CMA		;antistrefoume gt exoun arnhtikh logikh ta LED
+	STA 3000H
+	JMP LOOPA	;ksana ap thn arxh
+
+
+BIGGER:
+	CPI C8H	;elegxoume an >=200
+	JC UNDERDIAK
+	
+	SUI 64H	;an einai, afairoume prwta 100,
+			;wste me ta epomena 100 na afairethoun sinolika 200
+UNDERDIAK:
+	SUI 64H
+	JMP DEKADES	;exoume ton arithmo mas mod 100, opote pame DEKADES
+
+END

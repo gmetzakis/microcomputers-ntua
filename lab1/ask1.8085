@@ -1,0 +1,25 @@
+START:
+MVI B,01H	;vale B = 01H
+LDA 2000H	;fortwse to periex. ths 2000H
+CPI 00H	;sigrine ton A me to 0
+
+JZ FIRST  	;an Z=1 phgaine FIRST
+
+THIRD:
+RAR		;deksia olisthish tou A
+JC SECOND	;an C=1 phgaine SECOND
+
+INR B		;afksise kata 1 ton B
+JNZ THIRD	;an Z=0 phgaine THIRD
+
+SECOND:
+MOV A,B	;ton B ston A
+
+FIRST:
+CMA		;arnhtikh logikh ta leds
+STA 3000H	;emfanise sthn 3000H
+
+JMP START	;phgaine START
+
+END
+

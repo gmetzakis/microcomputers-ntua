@@ -1,0 +1,53 @@
+IN 10H			;gia thn prostasia mnhmhs
+LXI B,00C8H		;theloume 200ms, ara 200d -> 00C8H
+
+OFF0:
+	LDA 2000H	;sto OFF0 perimenoume na ginei ON
+	ANI 01H
+	CPI 01H
+	JNZ OFF0
+ON0:			;sto ON0 exei ginei ON, kai perimenoume na ksanaginei OFF
+	LDA 2000H
+	ANI 01H
+	CPI 00H
+	JNZ ON0
+START_LEDS:		;edw exei oloklhrwthei to zitoumeno motivo, opote anavoume
+	MVI A,00H	;ta LEDS, opou exoun arnhtikh logikh
+	MOV L,A
+COUNTER:
+	MVI D,00H	;o D einai o metriths pou afksanoume gia to poses fores
+COUNT_OFF:		;tha kanoume th loupa
+	MOV A,L
+	STA 3000H
+	CMA
+	MOV L,A	;kai oso o LSB diakoptis einai OFF, ekteloume th loupa mesa
+	CALL DELB	;se auto to block, kalwntas thn DELB gia thn kathisterish
+	INR D
+	LDA 2000H
+	ANI 01H
+	CPI 01H
+	JZ COUNT_ON
+	MOV A,D
+	CPI 4BH	;75decimal -> mexri ekei pame giati exoume 200msec h DELB,
+	JZ END_LEDS	;ara 15sec/0.2sec => 75 fores th DELB
+	JMP COUNT_OFF
+COUNT_ON:		;edw exei ginei ON o LSB, h diadikasia sinexizetai kanonika, 
+	MOV A,L	;wstoso twra o elegxos ginetai gia ton an ksanaginei OFF
+	STA 3000H
+	CMA
+	MOV L,A
+	CALL DELB
+	INR D
+	LDA 2000H
+	ANI 01H
+	CPI 00H
+	JZ COUNTER	;an exei ksanaginei OFF, pame sto COUNTER, opou ousiastika 
+	MOV A,D	;arxikopoioume ton metrhth D sto 0, wste na ananewthei kai 
+	CPI 4BH	;na ksekinhsei apo to 0 h olh diadikasia 
+	JZ END_LEDS
+	JMP COUNT_ON
+END_LEDS:		;edw erxomaste otan apla perasei o xronos xwris ananewsh, 
+	MVI A,FFH	;wste na mhdenisoume thn eksodo kai na ksanapame sthn arxh
+	STA 3000H
+	JMP OFF0
+END

@@ -1,0 +1,178 @@
+IN 10H
+START:
+LXI D,0860H		;edw arxikopoioume tis 4 LSB theseis tou 7segment
+	MVI A,10H	;sto 'keno', afou theloume na emfanisoume stis 2
+	STA 0860H	;MSB theseis mono
+	STA 0861H
+	STA 0862H
+	STA 0863H
+
+STILI0:
+	MVI A,FEH	;stn arxh kathe antistoixou block, vlepoume oti
+	STA 2800H	;xrhsimopoioume to xarakthrhstiko grammhs gia na
+	LDA 1800H	;elegksoume mia triada plhktrwn
+	MVI B,07H
+	ANA B		;ama to B einai 7, den exei patithei kanena apo
+	CPI 07H	;afth th grammh, opote gia na mhn kanoume elegxous
+	JZ STILI1	;xwris logo, proxwrame kateftheian sthn epomenh
+
+	MVI C,86H	;INCR STTP
+	CPI 06H
+	JZ DISPLAY
+	MVI C,85H	;FETCH PC
+	CPI 05H		
+	JZ DISPLAY
+	JMP START
+	
+STILI1:		;h idia logikh pantou
+	MVI A,FDH
+	STA 2800H
+	LDA 1800H
+	MVI B,07H
+	ANA B
+	CPI 07H
+	JZ STILI2
+	
+	MVI C,84H	;RUN
+	CPI 06H
+	JZ DISPLAY
+	MVI C,80H	;FETCH REG
+	CPI 05H		
+	JZ DISPLAY
+	MVI C,82H	;FETCH ADRS
+	CPI 03H
+	JZ DISPLAY
+
+STILI2:
+	MVI A,FBH
+	STA 2800H
+	LDA 1800H
+	MVI B,07H
+	ANA B
+	CPI 07H
+	JZ STILI3
+
+	MVI C,00H	;0
+	CPI 06H
+	JZ DISPLAY
+	MVI C,83H	;STORE/INCR
+	CPI 05H		
+	JZ DISPLAY
+	MVI C,81H	;DECR
+	CPI 03H
+	JZ DISPLAY
+
+
+STILI3:
+	MVI A,F7H
+	STA 2800H
+	LDA 1800H
+	MVI B,07H
+	ANA B
+	CPI 07H
+	JZ STILI4
+
+	MVI C,01H	;1
+	CPI 06H
+	JZ DISPLAY
+	MVI C,02H	;2
+	CPI 05H		
+	JZ DISPLAY
+	MVI C,03H	;3
+	CPI 03H
+	JZ DISPLAY
+
+
+STILI4:
+	MVI A,EFH
+	STA 2800H
+	LDA 1800H
+	MVI B,07H
+	ANA B
+	CPI 07H
+	JZ STILI5
+
+	MVI C,04H	;4
+	CPI 06H
+	JZ DISPLAY
+	MVI C,05H	;5
+	CPI 05H		
+	JZ DISPLAY
+	MVI C,06H	;6
+	CPI 03H
+	JZ DISPLAY
+
+STILI5:
+	MVI A,DFH
+	STA 2800H
+	LDA 1800H
+	MVI B,07H
+	ANA B
+	CPI 07H
+	JZ STILI6
+
+	MVI C,07H	;7
+	CPI 06H
+	JZ DISPLAY
+	MVI C,08H	;8
+	CPI 05H		
+	JZ DISPLAY
+	MVI C,09H	;9
+	CPI 03H
+	JZ DISPLAY
+
+STILI6:
+	MVI A,BFH
+	STA 2800H
+	LDA 1800H
+	MVI B,07H
+	ANA B
+	CPI 07H
+	JZ STILI7
+
+	MVI C,0AH	;A
+	CPI 06H
+	JZ DISPLAY
+	MVI C,0BH	;B
+	CPI 05H		
+	JZ DISPLAY
+	MVI C,0CH	;C
+	CPI 03H
+	JZ DISPLAY
+
+STILI7:
+	MVI A,7FH
+	STA 2800H
+	LDA 1800H
+	MVI B,07H
+	ANA B
+	CPI 07H
+	JZ START
+
+	MVI C,0DH	;D
+	CPI 06H
+	JZ DISPLAY
+	MVI C,0EH	;E
+	CPI 05H		
+	JZ DISPLAY
+	MVI C,0FH	;F
+	CPI 03H
+	JZ DISPLAY
+	
+
+DISPLAY:		;edw provaloume sto 7-segment
+	MOV A,C
+	ANI 0FH	;o C exei ton kwdiko kathe plhktrou
+	STA 0864H	;kratame ta 4LSBits tou kai vazoume ton
+	MOV A,C	;arithmo pou prokiptei sto 2o MSB tou 7seg
+	RRC
+	RRC		;kai kratame ta 4MSBits, ta kanoume 4 RRC
+	RRC		;kai antistoixa me prin, vazoume ton arithmo
+	RRC		;sto MSB tou 7seg
+	ANI 0FH
+	STA 0865H
+
+	CALL STDM	;kaloume tis STDM kai DCD gia na provlithei
+	CALL DCD
+	JMP START
+END
